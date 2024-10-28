@@ -3,7 +3,7 @@ import React from 'react'
 
 const Header = () => {
   return (
-    <div className="flex gap-6 w-full h-16 items-center">
+    <div className="flex gap-6 w-full h-16 items-center p-6">
         <Link href="/register" >
             <div className="text-xl font-bold text-green-600">
                 Cadastrar
