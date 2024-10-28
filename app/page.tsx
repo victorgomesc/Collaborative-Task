@@ -4,7 +4,7 @@ import TaskSection from "@/components/TaskSection";
 
 export default function Home() {
   return (
-    <div className="bg-gray-800">
+    <div className="bg-zinc-900 h-screen">
       <HeaderTitle />
       <Header />
       <TaskSection />
