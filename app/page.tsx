@@ -2,14 +2,19 @@
 
 import Header from "@/components/Header";
 import HeaderTitle from "@/components/HeaderTitle";
-import SectionTaskProvider from "@/components/SectionTaskProvider";
+import { QueryClientProvider } from "react-query";
+import { queryClient } from '../lib/react-query'
+import TaskSection from "@/components/TaskSection";
+
 
 export default function Home() {
   return (
     <div className="bg-zinc-900 h-screen">
-      <HeaderTitle />
-      <Header />
-      <SectionTaskProvider />
+      <QueryClientProvider client={queryClient}>
+        <HeaderTitle />
+        <Header />
+        <TaskSection />
+      </QueryClientProvider>
     </div>
         
   );

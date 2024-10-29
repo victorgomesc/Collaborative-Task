@@ -3,14 +3,14 @@ import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-interface createTaskInput {
-  name: string,
-  task: string,
-  state: string,
-  date: string,
-}
+//interface createTaskInput {
+ // name: string,
+ // task: string,
+ // state: string,
+ // date: string,
+//}
 
 const createTaskFormSchema = z.object({
   name: z.string().nonempty('Nome é um campo obrigatorio'),
@@ -23,15 +23,28 @@ const createTaskFormSchema = z.object({
 type createTaskFormData = z.infer<typeof createTaskFormSchema>
 
 const RegisterForm = () => {
+  const queryClient = useQueryClient()
   const { register, handleSubmit, formState: { errors } } = useForm<createTaskFormData>({
     resolver: zodResolver(createTaskFormSchema)
   })
 
   const { mutateAsync: createTaskFn } = useMutation({
     mutationFn: createTask,
+    onSuccess(_, variables ){
+      const cached = queryClient.getQueryData(['tasks'])
+
+      queryClient.setQueryData(['tasks'], data => {
+        return[...data, {
+          name: variables.name,
+          task: variables.task,
+          state: variables.state,
+          date: variables.date,
+        }]
+      })
+    },
   })
 
-  async function createTask( data: createTaskInput ) {
+  async function createTask( data: createTaskFormData ) {
     try {
       await createTaskFn({
         name: data.name,
@@ -39,17 +52,17 @@ const RegisterForm = () => {
         state: data.state,
         date: data.date,
       })
-
+      console.log('deu certo')
       alert('Task cadastrada!')
     } catch ( error ) {
       alert('Erro ao cadastrar a tarefa')
     }
 }
 
-const [nameValue, setNameValue] = useState<string>('');
-const [taskValue, setTaskValue] = useState<string>('');
-const [stateValue, setStateValue] = useState<string>('');
-const [dateValue, setDateValue] = useState<string>('');
+const [name, setNameValue] = useState<string>('');
+const [task, setTaskValue] = useState<string>('');
+const [state, setStateValue] = useState<string>('');
+const [date, setDateValue] = useState<string>('');
 
 const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   setNameValue(event.target.value)
@@ -85,7 +98,7 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               placeholder='Estudar' 
               className='bg-zinc-800 text-zinc-200 p-3' 
               {...register('name')}
-              value={nameValue}
+              value={name}
               onChange={handleNameChange}
             />
             {errors.name && <span>{errors.name.message}</span>}
@@ -99,7 +112,7 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               placeholder='Victor' 
               className='bg-zinc-800 text-zinc-200 p-3'
               {...register('task')}
-              value={taskValue}
+              value={task}
               onChange={handleTaskChange}
             />
             {errors.task && <span>{errors.task.message}</span>}
@@ -113,7 +126,7 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               placeholder='Product Backlog, etc' 
               className='bg-zinc-800 text-zinc-200 p-3'
               {...register('state')}
-              value={stateValue}
+              value={state}
               onChange={handleStateChange}
             />
             {errors.state && <span>{errors.state.message}</span>}
@@ -127,7 +140,7 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               placeholder='dd/mm/aaaa' 
               className='bg-zinc-800 text-zinc-200 p-3'
               {...register('date')}
-              value={dateValue}
+              value={date}
               onChange={handleDateChange}
             />
             {errors.date && <span>{errors.date.message}</span>}
