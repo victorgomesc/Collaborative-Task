@@ -3,8 +3,16 @@ import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 
-const createSignUpFormSchema = z.object({
+interface createTaskInput {
+  name: string,
+  task: string,
+  state: string,
+  date: string,
+}
+
+const createTaskFormSchema = z.object({
   name: z.string().nonempty('Nome é um campo obrigatorio'),
   task: z.string().nonempty('Task e um campo obrigatorio'),
   state: z.string().nonempty('stado e um campo obrigatorio'),
@@ -12,15 +20,30 @@ const createSignUpFormSchema = z.object({
 
 })
 
-type createSignUpFormData = z.infer<typeof createSignUpFormSchema>
+type createTaskFormData = z.infer<typeof createTaskFormSchema>
 
 const RegisterForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<createSignUpFormData>({
-    resolver: zodResolver(createSignUpFormSchema)
+  const { register, handleSubmit, formState: { errors } } = useForm<createTaskFormData>({
+    resolver: zodResolver(createTaskFormSchema)
   })
 
-  function CreateTask(data: any) {
-    setOutput(JSON.stringify(data, null, 2))
+  const { mutateAsync: createTaskFn } = useMutation({
+    mutationFn: createTask,
+  })
+
+  async function createTask( data: createTaskInput ) {
+    try {
+      await createTaskFn({
+        name: data.name,
+        task: data.task,
+        state: data.state,
+        date: data.date,
+      })
+
+      alert('Task cadastrada!')
+    } catch ( error ) {
+      alert('Erro ao cadastrar a tarefa')
+    }
 }
 
 const [nameValue, setNameValue] = useState<string>('');
@@ -52,7 +75,7 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             Cadastre a tarefa
           </h1>
 
-        <form onSubmit={handleSubmit(CreateTask)} className="flex flex-col h-full gap-y-4">
+        <form onSubmit={handleSubmit(createTask)} className="flex flex-col h-full gap-y-4">
             <label className="text-lg font-bold text-zinc-200">
               Digite o nome da tarefa:
             </label>
