@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { z } from "zod";
 
 
-interface TaskFormProps {
+export interface TaskFormProps {
   taskId?: string;
   name: string;
   task: string;

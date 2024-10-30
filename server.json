@@ -1,14 +1,6 @@
 {
   "tasks": [
     {
-      "taskId": "2",
-      "name": "Victor",
-      "task": "Estudar",
-      "state": "Pequena",
-      "date": "28/10/2024",
-      "id": "dce7"
-    },
-    {
       "taskId": "3",
       "name": "Victor",
       "task": "Estudar",
@@ -45,6 +37,13 @@
       "task": "Faculdade",
       "state": "Grande",
       "date": "20/11/2024"
+    },
+    {
+      "id": "dc2c",
+      "name": "Lucas",
+      "task": "Estudar",
+      "state": "Media",
+      "date": "01/11/2024"
     }
   ]
 }
