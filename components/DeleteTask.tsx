@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import React from 'react'
+import { queryClient } from '@/lib/react-query';
 
 interface Task {
     id?: string;
@@ -11,7 +12,7 @@ interface Task {
     date: string;
 }
 
-const TaskSection = () => {
+const DeleteTask = () => {
     const { data, isLoading, error } = useQuery<Task[]>('tasks', async () => {
         return axios.get("http://localhost:3333/tasks").then((response) => response.data);
     },{
@@ -19,6 +20,20 @@ const TaskSection = () => {
         refetchOnWindowFocus: true,
         refetchInterval: 50000,
     });
+
+    const { mutate } = useMutation(
+      async (id: string) => {
+          return axios.delete(`http://localhost:3333/tasks/${id}`);
+      },
+      {
+          onSuccess: () => {
+              queryClient.invalidateQueries('tasks');
+          },
+          onError: (error) => {
+              console.error('Erro ao deletar tarefa:', error);
+          },
+      }
+  );
 
     if(isLoading){
         return <div className='text-3xl'>Loading...</div>
@@ -32,21 +47,14 @@ const TaskSection = () => {
   return (
     <div className="w-full h-full flex flex-col items-center">
         <div className="w-4/5 p-6">
-            <h1 className="text-green-500 font-bold text-xl">Lista de Tarefas:</h1>
+            <h1 className="text-green-500 font-bold">Lista de Tarefas:</h1>
             <div className=''>
-                <div className="flex items-center gap-6 h-14 font-extrabold
-                text-zinc-100 border bg-zinc-800 border-zinc-800 hover:border-green-600 rounded-lg p-4 mt-3">
-                        <p className='w-full ml-3 font-bold'>Tarefa</p>
-                        <p className="w-full font-bold">Nome</p>
-                        <p className="w-full font-bold">Prioridade</p>
-                        <p className='w-full font-bold'>Entrega</p>
-                </div>
                 {data?.map((task: Task) => {
                     return(
                     <div 
                     key={task.id} 
-                    className="flex items-center gap-6 h-14  
-                    text-zinc-300 border bg-zinc-800 border-zinc-800 hover:border-green-600 rounded-lg p-4 mt-3"
+                    className="flex items-center gap-6 h-14 font-bold 
+                    text-zinc-200 border bg-zinc-800 border-zinc-800 hover:border-green-600 rounded-lg p-4 mt-3"
                     >
                         <p className='w-full ml-3'>{task.task}</p>
                         <p className="w-full">{task.name}</p>
@@ -65,6 +73,10 @@ const TaskSection = () => {
                         <p>{task.state}</p>
                         </div>
                         <p className='w-full'>{task.date}</p>
+                        <button onClick={() => mutate(task.id || '')}
+                          className="p-1 bg-red-700 hover:bg-red-500 rounded-lg">
+                          Deletar
+                        </button>
                     </div>
                     )
                 })}
@@ -75,4 +87,4 @@ const TaskSection = () => {
   )
 }
 
-export default TaskSection
+export default DeleteTask

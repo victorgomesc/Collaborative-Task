@@ -1,16 +1,16 @@
 "use client"
+import axios from 'axios';
 import React, { useState } from 'react'
-import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-//interface createTaskInput {
- // name: string,
- // task: string,
- // state: string,
- // date: string,
-//}
+
+interface TaskFormProps {
+  taskId?: string;
+  name: string;
+  task: string;
+  state: string;
+  date: string;
+}
 
 const createTaskFormSchema = z.object({
   name: z.string().nonempty('Nome é um campo obrigatorio'),
@@ -20,65 +20,35 @@ const createTaskFormSchema = z.object({
 
 })
 
-type createTaskFormData = z.infer<typeof createTaskFormSchema>
+//type createTaskFormData = z.infer<typeof createTaskFormSchema>
 
-const RegisterForm = () => {
-  const queryClient = useQueryClient()
-  const { register, handleSubmit, formState: { errors } } = useForm<createTaskFormData>({
-    resolver: zodResolver(createTaskFormSchema)
-  })
+console.log(createTaskFormSchema)
 
-  const { mutateAsync: createTaskFn } = useMutation({
-    mutationFn: createTask,
-    onSuccess(_, variables ){
-      const cached = queryClient.getQueryData(['tasks'])
+const RegisterTaskForm: React.FC<TaskFormProps> = () => {
+  const [name, setName] = useState<string>('');
+  const [task, setTask] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [date, setDate] = useState<string>('');
 
-      queryClient.setQueryData(['tasks'], data => {
-        return[...data, {
-          name: variables.name,
-          task: variables.task,
-          state: variables.state,
-          date: variables.date,
-        }]
-      })
-    },
-  })
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  async function createTask( data: createTaskFormData ) {
+    const newTask = {
+      name,
+      task,
+      state,
+      date,
+    };
+
     try {
-      await createTaskFn({
-        name: data.name,
-        task: data.task,
-        state: data.state,
-        date: data.date,
-      })
-      console.log('deu certo')
-      alert('Task cadastrada!')
-    } catch ( error ) {
-      alert('Erro ao cadastrar a tarefa')
+      await axios.post('http://localhost:3333/tasks', newTask);
+      alert('Tarefa cadastrada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao cadastrar a tarefa:', error);
     }
-}
-
-const [name, setNameValue] = useState<string>('');
-const [task, setTaskValue] = useState<string>('');
-const [state, setStateValue] = useState<string>('');
-const [date, setDateValue] = useState<string>('');
-
-const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  setNameValue(event.target.value)
-}
-
-const handleTaskChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  setTaskValue(event.target.value)
-}
-
-const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  setStateValue(event.target.value)
-}
-
-const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  setDateValue(event.target.value)
-}
+  }
+  
 
   return (
     <div className="h-screen w-full flex items-center justify-center">
@@ -88,7 +58,7 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             Cadastre a tarefa
           </h1>
 
-        <form onSubmit={handleSubmit(createTask)} className="flex flex-col h-full gap-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full gap-y-4">
             <label className="text-lg font-bold text-zinc-200">
               Digite o nome da tarefa:
             </label>
@@ -96,54 +66,50 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <input 
               type='text' 
               placeholder='Estudar' 
-              className='bg-zinc-800 text-zinc-200 p-3' 
-              {...register('name')}
+              className='bg-zinc-800 text-zinc-200 p-3 rounded-lg' 
               value={name}
-              onChange={handleNameChange}
+              onChange={(e) => setName(e.target.value)}
+              required
             />
-            {errors.name && <span>{errors.name.message}</span>}
 
             <label className="text-lg font-bold text-zinc-200">
-              Digite o nome do autor:
+              Digite seu nome:
             </label>
 
             <input 
               type='text' 
               placeholder='Victor' 
-              className='bg-zinc-800 text-zinc-200 p-3'
-              {...register('task')}
+              className='bg-zinc-800 text-zinc-200 p-3 rounded-lg'
               value={task}
-              onChange={handleTaskChange}
+              onChange={(e) => setTask(e.target.value)}
+              required
             />
-            {errors.task && <span>{errors.task.message}</span>}
 
             <label className="text-lg font-bold text-zinc-200">
-              Digite o estado da tarefa:
+              Digite a prioridade da tarefa:
             </label>
 
             <input 
               type='text' 
-              placeholder='Product Backlog, etc' 
-              className='bg-zinc-800 text-zinc-200 p-3'
-              {...register('state')}
+              placeholder='Pequena, Media, Grande' 
+              className='bg-zinc-800 text-zinc-200 p-3 rounded-lg'
               value={state}
-              onChange={handleStateChange}
+              onChange={(e) => setState(e.target.value)}
+              required
             />
-            {errors.state && <span>{errors.state.message}</span>}
 
             <label className="text-lg font-bold text-zinc-200">
-              Digite a data de criação:
+              Digite a data de conclusão da tarefa:
             </label>
 
             <input 
               type="text" 
               placeholder='dd/mm/aaaa' 
-              className='bg-zinc-800 text-zinc-200 p-3'
-              {...register('date')}
+              className='bg-zinc-800 text-zinc-200 p-3 rounded-lg'
               value={date}
-              onChange={handleDateChange}
+              onChange={(e) => setDate(e.target.value)}
+              required
             />
-            {errors.date && <span>{errors.date.message}</span>}
 
             <div className="flex items-center justify-center">
               <button type="submit" className="bg-green-700 hover:bg-green-600 h-9 w-28 rounded-xl max-w-24 p-1 font-bold">
@@ -158,4 +124,4 @@ const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   )
 }
 
-export default RegisterForm
+export default RegisterTaskForm
