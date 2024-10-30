@@ -9,7 +9,7 @@ import TaskSection from "@/components/TaskSection";
 
 export default function Home() {
   return (
-    <div className="bg-zinc-900 h-screen">
+    <div className="h-screen">
       <QueryClientProvider client={queryClient}>
         <HeaderTitle />
         <Header />
