@@ -13,8 +13,8 @@ export interface TaskFormProps {
 }
 
 const createTaskFormSchema = z.object({
-  name: z.string().nonempty('Nome é um campo obrigatorio'),
   task: z.string().nonempty('Task e um campo obrigatorio'),
+  name: z.string().nonempty('Nome é um campo obrigatorio'),
   state: z.string().nonempty('stado e um campo obrigatorio'),
   date: z.string().nonempty('Data e um campo obrigatorio')
 
@@ -25,8 +25,8 @@ const createTaskFormSchema = z.object({
 console.log(createTaskFormSchema)
 
 const RegisterTaskForm: React.FC<TaskFormProps> = () => {
-  const [name, setName] = useState<string>('');
   const [task, setTask] = useState<string>('');
+  const [name, setName] = useState<string>('');
   const [state, setState] = useState<string>('');
   const [date, setDate] = useState<string>('');
 
@@ -35,8 +35,8 @@ const RegisterTaskForm: React.FC<TaskFormProps> = () => {
     e.preventDefault();
 
     const newTask = {
-      name,
       task,
+      name,
       state,
       date,
     };
@@ -67,8 +67,8 @@ const RegisterTaskForm: React.FC<TaskFormProps> = () => {
               type='text' 
               placeholder='Estudar' 
               className='bg-zinc-800 text-zinc-200 p-3 rounded-lg' 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
               required
             />
 
@@ -80,8 +80,8 @@ const RegisterTaskForm: React.FC<TaskFormProps> = () => {
               type='text' 
               placeholder='Victor' 
               className='bg-zinc-800 text-zinc-200 p-3 rounded-lg'
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
 
