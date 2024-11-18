@@ -75,7 +75,7 @@ const DeleteTask = () => {
                         </div>
                         <p className='w-full'>{task.date}</p>
                         <button onClick={() => mutate(task.id || '')}
-                          className="p-1 bg-red-700 hover:bg-red-500 rounded-lg">
+                          className="p-1 hover:bg-red-500 rounded-lg">
                           <Trash2 />
                         </button>
                     </div>
