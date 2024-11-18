@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useMutation, useQuery } from 'react-query'
 import React from 'react'
 import { queryClient } from '@/lib/react-query';
+import { Trash2 } from 'lucide-react';
 
 interface Task {
     id?: string;
@@ -75,7 +76,7 @@ const DeleteTask = () => {
                         <p className='w-full'>{task.date}</p>
                         <button onClick={() => mutate(task.id || '')}
                           className="p-1 bg-red-700 hover:bg-red-500 rounded-lg">
-                          Deletar
+                          <Trash2 />
                         </button>
                     </div>
                     )
